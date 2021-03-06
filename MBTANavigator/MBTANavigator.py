@@ -31,11 +31,13 @@ class MBTANavigator:
     
     #Connect using the API key, if available.
     def connect(self):
-        
         conn = http.client.HTTPSConnection('api-v3.mbta.com')
-        conn.request("GET", "/routes?filter[type]=0,1")
+        if len(self.APIKey) == 0:
+            connReq = "?api_key=" + self.APIKey
+        else:
+            connReq = ""
+        conn.request("GET", "/routes?filter[type]=0,1" + connReq)
         res = conn.getresponse()
-        
         print(res.read().decode())
         conn.close()
 
