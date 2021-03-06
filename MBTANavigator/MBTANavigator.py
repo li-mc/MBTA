@@ -7,11 +7,8 @@ Created on Sat Mar  6 15:39:57 2021
 This uses the MBTA API to fetch, filter, and output subway-only routes.
 If an API key is available, load from file.  
 """
-
-import os, sys
 from os import path
 import http.client
-import json
 
 class MBTANavigator:
     def __init__(self):
