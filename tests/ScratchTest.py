@@ -12,5 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(testdir, srcdir)))
 from MBTANavigator import MBTANavigator
 
 if __name__ == "__main__":
-    mb = MBTANavigator();
-    mb.loadKey();
+    mb = MBTANavigator()
+    keyPath = os.path.join(sys.path[0], 'key.txt')
+    mb.loadKey(keyPath)
+    mb.connect()

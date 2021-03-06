@@ -10,14 +10,16 @@ If an API key is available, load from file.
 
 import os, sys
 from os import path
+import http.client
+import json
 
 class MBTANavigator:
     def __init__(self):
         self.APIKey = ''
+        self.API = 'api-v3.mbta.com';
     
-    #Load an API key from source "key.txt" if available.
-    def loadKey(self):
-        keyPath = os.path.join(sys.path[0], "key.txt")
+    #Load an API key from filepath if available.
+    def loadKey(self, keyPath):
         if path.exists(keyPath):
             fl = open(keyPath, "r")
             self.APIKey = fl.read();
@@ -27,4 +29,14 @@ class MBTANavigator:
     def getKey(self):
         return self.APIKey
     
-    #
+    #Connect using the API key, if available.
+    def connect(self):
+        
+        conn = http.client.HTTPSConnection('api-v3.mbta.com')
+        conn.request("GET", "/routes?filter[type]=0,1")
+        res = conn.getresponse()
+        
+        print(res.read().decode())
+        conn.close()
+
+        
