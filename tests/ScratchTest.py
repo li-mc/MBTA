@@ -13,6 +13,9 @@ from MBTANavigator import MBTANavigator
 
 if __name__ == "__main__":
     mb = MBTANavigator()
-    keyPath = os.path.join(sys.path[0], 'key.txt')
+    keyPath = "key.txt"
     mb.loadKey(keyPath)
     rt = mb.getLongNames()
+    
+    
+    

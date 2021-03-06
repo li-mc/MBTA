@@ -15,34 +15,54 @@ class MBTANavigator:
         self.APIKey = ''
         self.API = 'api-v3.mbta.com'
         self.data = ''
+        self.covidMode = False
         
     def getLongNames(self):
         if len(self.data) == 0:
-            print(self.getRoutes())
-        else:
-            print(self.data)
+            self.getRoutes()
+        print(self.data)
+        return 0
+    
+    def getUniqueStops(self):
+        return 0
+    
+    def getMostStops(self):
+        return 0
+    
+    def getFewestStops(self):
+        return 0
+    
+    #Other interesting statistic
+    def getMostConnectivity(self):
+        return 0
+    
+    
+    #Get list of routes between firstStop and secondStop.
+    def getRoutesBetweenStops(self, firstStop, secondStop):
+        return 0
+        
+    def setCovidMode(self, mode):
+        if isinstance(mode, bool):
+            self.covidMode = mode
     
     #Load an API key from filepath if available.
     def loadKey(self, keyPath):
         if path.exists(keyPath):
             fl = open(keyPath, "r")
-            self.APIKey = fl.read();
+            self.APIKey = fl.read().strip();
             fl.close()
             
-    #Return the API Key.      
-    def getKey(self):
-        return self.APIKey
     
     #Connect using the API key, if available.
     def getRoutes(self):
         conn = http.client.HTTPSConnection('api-v3.mbta.com')
         if len(self.APIKey) == 0:
-            connReq = "?api_key=" + self.APIKey
+            connReq = "?filter[type]=0,1"
         else:
-            connReq = ""
-        conn.request("GET", "/routes?filter[type]=0,1" + connReq)
+            connReq = "?api_key=" + self.APIKey + "&filter[type]=0,1";
+        conn.request("GET", "/routes" + connReq)
         res = conn.getresponse().read().decode()
-        self.data = res
+        self.data = res;
         conn.close()
         return res
 
