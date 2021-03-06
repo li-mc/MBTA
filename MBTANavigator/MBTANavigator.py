@@ -13,7 +13,14 @@ import http.client
 class MBTANavigator:
     def __init__(self):
         self.APIKey = ''
-        self.API = 'api-v3.mbta.com';
+        self.API = 'api-v3.mbta.com'
+        self.data = ''
+        
+    def getLongNames(self):
+        if len(self.data) == 0:
+            print(self.getRoutes())
+        else:
+            print(self.data)
     
     #Load an API key from filepath if available.
     def loadKey(self, keyPath):
@@ -27,15 +34,16 @@ class MBTANavigator:
         return self.APIKey
     
     #Connect using the API key, if available.
-    def connect(self):
+    def getRoutes(self):
         conn = http.client.HTTPSConnection('api-v3.mbta.com')
         if len(self.APIKey) == 0:
             connReq = "?api_key=" + self.APIKey
         else:
             connReq = ""
         conn.request("GET", "/routes?filter[type]=0,1" + connReq)
-        res = conn.getresponse()
-        print(res.read().decode())
+        res = conn.getresponse().read().decode()
+        self.data = res
         conn.close()
+        return res
 
         

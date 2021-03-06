@@ -15,4 +15,4 @@ if __name__ == "__main__":
     mb = MBTANavigator()
     keyPath = os.path.join(sys.path[0], 'key.txt')
     mb.loadKey(keyPath)
-    mb.connect()
+    rt = mb.getLongNames()
