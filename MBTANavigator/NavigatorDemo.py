@@ -50,6 +50,14 @@ if __name__ == "__main__":
     print("We can also take the train between State and North Station: "
           + str(mb.getRoutesBetweenStops("State", "North Station")))
     print("But we can't reach Community College, which is one stop away: " 
-          + str(mb.getRoutesBetweenStops("State", "Community College")))
+          + str(mb.getRoutesBetweenStops("State", "Community College")) + "\n")
+    print("We can ask if travel is possible between two stops. For State to North Station,"
+          + " the answer is: " + str(mb.travelIsPossible("State", "North Station")))
+    print("And for State and Community College, the answer is: " 
+          + str(mb.travelIsPossible("State", "Community College")) + "\n")
+    mb.setCovidMode(False)
+    print("Finally, if we turn off COVID Mode, we can ask about State to "
+          + "North Station again, and the answer is: " 
+          + str(mb.travelIsPossible("State", "North Station")))
 
     

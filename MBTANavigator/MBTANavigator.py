@@ -18,11 +18,13 @@ getMostStops() returns the long name of the route with the most stops.
 getFewestStops() returns the long name of the route with the fewest stops.
 getMostConnectivity() returns the name of the stop that has the most 
 connections to other stops.
-getRoutesBetweenStops() returns a list of routes between two stops.
+getRoutesBetweenStops(stop1, stop2) returns a list of routes between two stops.
 setCovidMode(bool) allows assignment of a mode that closes stops with 
 certain names and allows connected closed stops to be travelled between.
 Setting to false restores the previous state of closures and removes the
 special mode.
+travelIsPossible(stop1, stop2) returns whether it is possible to travel 
+between two stops.
 
 """
 from os import path
@@ -108,6 +110,15 @@ class MBTANavigator:
                 prevRoutes = routeName
        
         return outputRoutes    
+    
+    #Return whether travel between two stops is possible, without regard to
+    #the actual route.
+    def travelIsPossible(self, firstStop, secondStop):
+        path = self.stopGraph.getPathBetweenStops(firstStop, secondStop)
+        if len(path) == 0:
+            return False
+        else:
+            return True
     
     #Set COVID Mode on or off, closing stops that contain a word starting with 
     #[C, O, V, I, D]
