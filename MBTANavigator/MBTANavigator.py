@@ -27,6 +27,8 @@ class MBTANavigator:
         self.stopsLongName = {}
         #Dictionary mapping stop name to whether they are closed or not
         self.stopsClosed = {}
+        #Special case for also closing a certain subset of stops.
+        self.stopsClosedCovid = {}
         
     def getLongNames(self):
         longNames = []
@@ -36,7 +38,7 @@ class MBTANavigator:
 
     #Get the total count of unique stops
     def getUniqueStops(self):
-        return(len(self.allStops))
+        return(len(self.stopGraph.getGraph().keys()))
     
     #Return the long name of the Route with the most stops
     def getMostStops(self):
@@ -63,12 +65,41 @@ class MBTANavigator:
     #Get list of routes between firstStop and secondStop.
     #Return empty if none.
     def getRoutesBetweenStops(self, firstStop, secondStop):
-        return 0
-        
-    def setCovidMode(self, mode):
-        if isinstance(mode, bool):
-            self.covidMode = mode
+        path = self.stopGraph.getPathBetweenStops(firstStop, secondStop)
+        if len(path) == 0:
+            return []
+        else:
+            #Interpret path into routes.
+            outputRoutes = []
+            for stop in path:
+                routeName = self.stopsLongName[stop]
+                #Add a route if transferring to a new, unique line
+                if len(routeName) == 1 and routeName[0] not in outputRoutes:
+                    outputRoutes.append(routeName[0])     
+        return outputRoutes    
     
+    #Set COVID Mode on or off, closing stops that contain a word starting with 
+    #[C, O, V, I, D]
+    #Respects case
+    def setCovidMode(self, mode):
+        if not isinstance(mode, bool):
+            raise TypeError('Invalid input for Covid Mode')
+        #Update settings to turn on covid mode
+        if not mode:
+            self.stopGraph.setClosedStops(self.stopsClosed)
+        else:
+            #Copy self.stopsClosed in case there are already stops closed.
+            self.stopsClosedCovid = self.stopsClosed.copy()
+            covArr = ['C', 'O', 'V', 'I', 'D']
+            stopList = self.stopsClosedCovid.keys()
+            for stop in stopList:
+                splitStop = stop.split()
+                for letter in covArr:
+                    hasLetter = [x.startswith(letter) for x in splitStop]
+                    if any(hasLetter):
+                        self.stopsClosedCovid[stop] = True
+            self.stopGraph.setClosedStops(self.stopsClosedCovid)     
+                
     #Load an API key from filepath if available.
     def loadKeyFromPath(self, keyPath):
         if path.exists(keyPath):
@@ -109,7 +140,7 @@ class MBTANavigator:
                 if stopName not in self.stopsLongName:
                     self.stopsLongName[stopName] = [route['attributes']['long_name']]
                 else:
-                    self.stopsLongName[stopName].append([route['attributes']['long_name']])
+                    self.stopsLongName[stopName].append(route['attributes']['long_name'])
                         
                 #Build graph
                 self.stopGraph.addStop(stopName)
@@ -126,7 +157,9 @@ class MBTANavigator:
                                         route['id'],
                                         route['attributes']['direction_names'],
                                         len(stops)))
-            
+        #Add closures to the graph
+        self.stopGraph.setClosedStops(self.stopsClosed)
+
         #Manually clear and reassign the southern tips of the Red Line.
         #[TODO] Is there a distinction between Ashmont/Braintree lines being missed?
         stopsToClear = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
@@ -164,6 +197,6 @@ if __name__ == "__main__":
     mb.loadKeyFromPath(keyPath)
     mb.getData()
     rt = mb.getLongNames()
-    print(mb.getMostConnectivity())
+    mb.setCovidMode(True)
     
         

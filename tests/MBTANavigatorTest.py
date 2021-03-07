@@ -10,12 +10,12 @@ This information is easily available so it can be tested directly.
 Tests that build the underlying graph are in StopGraphTest.py
 
 Covers the following:
-Retrieve a text list of each route "Long Name"
-Get the total number of unique stops
-Get the name of the route with the most stops and the route with the fewest
-Get the route with the highest connectivity with other routes
-Get a list of routes between two stops
-Get a list of routes between two stops after COVID blockages that block 
+* Retrieve a text list of each route "Long Name"
+* Get the total number of unique stops
+* Get the name of the route with the most stops and the route with the fewest
+* Get the route with the highest connectivity with other routes
+* Get a list of routes between two stops
+* Get a list of routes between two stops after COVID blockages that block 
 certain stops.
 
 """
@@ -33,6 +33,7 @@ class MBTANavigatorTest(unittest.TestCase):
                            'Green Line B', 'Green Line C', 'Green Line D',
                            'Green Line E', 'Blue Line'];
         self.navi = MBTANavigator()
+        self.navi.loadKey("7c2ebb9b2cd74b62905201d54a8258ab")
         self.navi.getData()
      
     
@@ -75,7 +76,7 @@ class MBTANavigatorTest(unittest.TestCase):
     def testOrderedRoutesSecondFail(self):
         self.navi.getRoutesBetweenStops('North Quincy', [])
         
-    #Test edge case where a stop can access itself.
+    #Test edge case where we go from one stop to the same stop.
     def testOrderedRoutesSame(self):
         ans = self.navi.getRoutesBetweenStops('North Quincy', 'North Quincy')
         self.assertEqual(ans, [])
@@ -89,31 +90,31 @@ class MBTANavigatorTest(unittest.TestCase):
     def testDiffRoute(self):
         ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Central')
         self.assertEqual(ans, ['Orange Line', 'Red Line'])
-        
+    
+    #Test that directionality is respected
     def testDiffDirectional(self):
         ans = self.navi.getRoutesBetweenStops('Central', 'Stony Brook')
         self.assertEqual(ans, ['Red Line', 'Orange Line'])
         
-    #Test that COVID-closing stations has no effect on a trip without closures
-    def testCOVIDRouteFalse(self):
-        self.navi.setCovidMode(True)
-        ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Back Bay')
-        self.assertEqual(ans, 'Orange Line')
-    
-    #Test that COVID-closing stations has an effect on a trip
-    def testCOVIDRouteTrue(self):
-        self.navi.setCovidMode(True)
-        ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
-        self.assertEqual(ans, [])
-    
-    #Test COVID mode can be turned on and off
-    def testCOVIDModeReset(self):
+    #Test expected failure for setting Covid mode
+    @unittest.expectedFailure
+    def testCovidClosureFailure(self):
+        self.navi.setCovidMode('foo')
+     
+    #Test navigation failure after COVID closure
+    def testCovidClosure(self):
         self.navi.setCovidMode(True)
         ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
         self.assertEqual(ans, [])
-        self.navi.setCovidMode(False)
-        ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
-        self.assertEqual(ans, ['Orange Line'])
-
+        
+    #Test COVID closure being turned on and off.'
+    def testTurnOffCovidClosure(self):
+       self.navi.setCovidMode(True)
+       ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
+       self.assertEqual(ans, [])
+       self.navi.setCovidMode(False)
+       ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
+       self.assertEqual(ans, ['Orange Line'])
+   
 if __name__ == "__main__":
     unittest.main()
