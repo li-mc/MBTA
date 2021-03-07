@@ -13,8 +13,7 @@ all routes.
 * getFewestStops() returns the long name of the route with the fewest stops.  
 * getMostConnectivity() returns the name of the stop that has the most connections to other stops.  
 * getRoutesBetweenStops(stop1, stop2) returns a list of routes between two stops.  
-* setCovidMode(bool) allows assignment of a mode that closes stops with 
-* certain names and allows connected closed stops to be travelled between. Setting to false restores the previous state of closures and removes the special mode.  
+* setCovidMode(bool) allows assignment of a mode that closes stops with certain names and allows connected closed stops to be travelled between. Setting to false restores the previous state of closures and removes the special mode.  
 * travelIsPossible(stop1, stop2) returns whether it is possible to travel between two stops.  
 
 ![Demo Output](demo_screenshot.png)
