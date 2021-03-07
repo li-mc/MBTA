@@ -18,8 +18,6 @@ all routes.
 
 ![Demo Output](demo_screenshot.png)
 
-
-
 ***
 
 Text of original tasks:
