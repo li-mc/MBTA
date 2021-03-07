@@ -1,7 +1,7 @@
 ## Broad Institute Genomics Platform software engineer take-home
 Li McCarthy | Mar. 5 2021
 
-This is a small program that retrieves data from the open-source MBTA API and uses it to answer questions
+This is a small program that retrieves data from the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions
 about the rail lines.  A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  A screenshot of the output is attached at the end of this section.  
 
 The program can also be run manually by instantiating MBTANavigator.py.  To load data, first load API key (optional but recommended) with loadKey(key) or loadKeyFromFile(file).  Then call getData() to generate internal data structures.  
