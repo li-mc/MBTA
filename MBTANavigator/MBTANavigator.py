@@ -21,8 +21,12 @@ class MBTANavigator:
         self.routeData = ''
         self.stopData = ''
         self.covidMode = False
+        #List of all routes as Route objects
         self.allRoutes = []
+        #Dictionary mapping stop name to their route long name
         self.stopsLongName = {}
+        #Dictionary mapping stop name to whether they are closed or not
+        self.stopsClosed = {}
         
     def getLongNames(self):
         longNames = []
@@ -64,7 +68,7 @@ class MBTANavigator:
             fl = open(keyPath, "r")
             self.APIKey = fl.read().strip();
             fl.close()
-            
+
     #Load key from text
     def loadKey(self, key):
         self.APIKey = key;
@@ -77,47 +81,60 @@ class MBTANavigator:
             connReq = "?"
         else:
             connReq = "?api_key=" + self.APIKey + "&";
+        #Filter by type of route to avoid pulling high-density bus data.
         conn.request("GET", "/routes" + connReq + "filter[type]=0,1") 
         res = conn.getresponse().read().decode()
         self.routeData = json.loads(res)["data"]
         
-        
+        #Create graph
+        self.stopGraph = StopGraph()
+         
+        prevStop = []
         for route in self.routeData:
-            conn.request("GET", "/stops" + connReq 
-                         + "filter[route]=" + route['id'])
-            res = conn.getresponse().read().decode()
-            stops = json.loads(res)['data']
-            for stop in stops:
-                if stop['attributes']['name'] not in self.stopsLongName:
-                    self.stopsLongName[stop['attributes']['name']] = [route['attributes']['long_name']]
-                else:
-                    self.stopsLongName[stop['attributes']['name']].append(route['attributes']['long_name'])
+            for direction in route['attributes']['direction_names']:
+                conn.request("GET", "/stops" + connReq 
+                         + "filter[route]=" + route['id']
+                         + "&filter[direction_id]=" + direction)
+                res = conn.getresponse().read().decode()
+                stops = json.loads(res)['data']
+                                
+                for stop in stops:
+                    stopName = stop['attributes']['name']
+                    self.stopsClosed[stopName] = False
+                    if stopName not in self.stopsLongName:
+                        self.stopsLongName[stopName] = [route['attributes']['long_name']]
+                    else:
+                        self.stopsLongName[stopName].append(route['attributes']['long_name'])
+                        
+                    #Build graph
+                    self.stopGraph.addStop(stopName)
+                    if len(prevStop) > 0:
+                        self.stopGraph.addEdge(prevStop, stopName)
+                        self.stopGraph.addEdge(stopName, prevStop)
+                        
+                    prevStop = stopName;
+                    
+                #Reach the end of the line.
+                prevStop = []
+                
+            
+            
             
             #Add a route to the list of routes
             self.allRoutes.append(Route(route['attributes']['long_name'],
                                         route['id'],
                                         route['attributes']['direction_names'],
                                         len(stops)))
-            
-            dirName = route['attributes']['direction_names'];
-            for direction in dirName:
-                conn.request("GET", "/stops" + connReq 
-                             + "filter[route]=" + route['id']
-                             + "&filter[direction_id]=" + direction)
-                
-                res = conn.getresponse().read().decode()
-                
-           
-        print(self.stopsLongName)
- 
+
         #Close connection
+        print(self.stopGraph.getGraph())
         conn.close()
         
   
 if __name__ == "__main__":
     mb = MBTANavigator()
-    keyPath = "key.txt'"
-    mb.loadKey('7c2ebb9b2cd74b62905201d54a8258ab')
+    keyPath = "key.txt"
+    mb.loadKeyFromPath(keyPath)
     mb.getData()
     rt = mb.getLongNames()
     print(mb.getMostStops())
