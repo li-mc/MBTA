@@ -3,7 +3,10 @@
 """
 Created on Sat Mar  6 15:55:35 2021
 
-@author: Work
+Just some scratch notes used to exercise the code.  
+Included for transparency.
+
+@author: Li
 """
 import sys, os
 testdir = os.path.dirname(__file__)
@@ -13,9 +16,13 @@ from MBTANavigator import MBTANavigator
 
 if __name__ == "__main__":
     mb = MBTANavigator()
-    keyPath = "key.txt"
+    keyPath = "key.txt'"
     mb.loadKey(keyPath)
+    mb.getData()
     rt = mb.getLongNames()
+    mb.getUniqueStops()
+    print(rt)
+    
     
     
     
