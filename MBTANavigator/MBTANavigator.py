@@ -49,12 +49,19 @@ class MBTANavigator:
         return self.allRoutes[routeInd].getLongName()
             
     #Other interesting statistic:
-    #Return the long name of the route with the most connections to other routes.
+    #Return the long name of the stop with the most connectivity to other stops
     def getMostConnectivity(self):
-        return 0
+        graph = self.stopGraph.getGraph();
+        maxStops = 0;
+        for key in graph.keys():
+            if len(graph[key]) > maxStops:
+                maxStops = len(graph[key])
+                mostConn = key
+        return mostConn             
     
     
     #Get list of routes between firstStop and secondStop.
+    #Return empty if none.
     def getRoutesBetweenStops(self, firstStop, secondStop):
         return 0
         
@@ -86,48 +93,68 @@ class MBTANavigator:
         res = conn.getresponse().read().decode()
         self.routeData = json.loads(res)["data"]
         
-        #Create graph
+        #Initialize graph
         self.stopGraph = StopGraph()
          
         prevStop = []
         for route in self.routeData:
-            for direction in route['attributes']['direction_names']:
-                conn.request("GET", "/stops" + connReq 
-                         + "filter[route]=" + route['id']
-                         + "&filter[direction_id]=" + direction)
-                res = conn.getresponse().read().decode()
-                stops = json.loads(res)['data']
+            conn.request("GET", "/stops" + connReq 
+                         + "filter[route]=" + route['id'])
+            res = conn.getresponse().read().decode()
+            stops = json.loads(res)['data']
                                 
-                for stop in stops:
-                    stopName = stop['attributes']['name']
-                    self.stopsClosed[stopName] = False
-                    if stopName not in self.stopsLongName:
-                        self.stopsLongName[stopName] = [route['attributes']['long_name']]
-                    else:
-                        self.stopsLongName[stopName].append(route['attributes']['long_name'])
+            for stop in stops:
+                stopName = stop['attributes']['name']
+                self.stopsClosed[stopName] = False
+                if stopName not in self.stopsLongName:
+                    self.stopsLongName[stopName] = [route['attributes']['long_name']]
+                else:
+                    self.stopsLongName[stopName].append([route['attributes']['long_name']])
                         
-                    #Build graph
-                    self.stopGraph.addStop(stopName)
-                    if len(prevStop) > 0:
-                        self.stopGraph.addEdge(prevStop, stopName)
-                        self.stopGraph.addEdge(stopName, prevStop)
-                        
-                    prevStop = stopName;
-                    
-                #Reach the end of the line.
-                prevStop = []
+                #Build graph
+                self.stopGraph.addStop(stopName)
+                if len(prevStop) > 0:
+                    self.stopGraph.addEdge(prevStop, stopName)
+                    self.stopGraph.addEdge(stopName, prevStop)                       
+                prevStop = stopName;
+                #Reach the end of the line and reset.
+            prevStop = []
                 
             
-            
-            
-            #Add a route to the list of routes
+            #Add a route to the list of routes.
             self.allRoutes.append(Route(route['attributes']['long_name'],
                                         route['id'],
                                         route['attributes']['direction_names'],
                                         len(stops)))
-
+            
+        #Manually clear and reassign the southern tips of the Red Line.
+        #[TODO] Is there a distinction between Ashmont/Braintree lines being missed?
+        stopsToClear = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
+                        'Shawmut', 'Ashmont', 'North Quincy', 'Wollaston',
+                        'Quincy Center', 'Quincy Adams', 'Braintree']
+        for stop in stopsToClear:
+            self.stopGraph.clearStop(stop)
+            
+        #Reassign the tips.
+        prevStop = 'Andrew';
+        ashLine = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
+                   'Shawmut', 'Ashmont', 'Cedar Grove']
+        brainLine = ['JFK/UMass', 'North Quincy', 'Wollaston', 'Quincy Center',
+                     'Quincy Adams', 'Braintree']
+        
+        for stop in ashLine:
+            self.stopGraph.addEdge(prevStop, stop)
+            self.stopGraph.addEdge(stop, prevStop)
+            prevStop = stop
+        
+        prevStop = 'Andrew';
+        for stop in brainLine:
+            self.stopGraph.addEdge(prevStop, stop)
+            self.stopGraph.addEdge(stop, prevStop)
+            prevStop = stop
+        
+        
         #Close connection
-        print(self.stopGraph.getGraph())
         conn.close()
         
   
@@ -137,7 +164,6 @@ if __name__ == "__main__":
     mb.loadKeyFromPath(keyPath)
     mb.getData()
     rt = mb.getLongNames()
-    print(mb.getMostStops())
-    print(mb.getFewestStops())
+    print(mb.getMostConnectivity())
     
         

@@ -57,10 +57,10 @@ class MBTANavigatorTest(unittest.TestCase):
         nm = self.navi.getFewestStops()
         self.assertEqual(nm, 'Mattapan Trolley')
     
-    #Test that the return for the best-connected MBTA subway route is correct.
-    def testConnectedRoute(self):
+    #Test that the return for the stop with the most transfers is correct.
+    def testConnectedStop(self):
         nm = self.navi.getMostConnectivity()
-        self.assertEqual(nm, 'Orange Line')
+        self.assertEqual(nm, 'Park Street')
     
     #Test entering invalid inputs for ordered routes.
     @unittest.expectedFailure
