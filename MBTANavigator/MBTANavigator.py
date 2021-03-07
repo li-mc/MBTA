@@ -5,6 +5,24 @@ Created on Sat Mar  6 15:39:57 2021
 
 @author: Li 
 This class uses the MBTA API to fetch, filter, and output subway-only routes.
+https://api-v3.mbta.com/routes
+
+To load data, first load API key (optional but recommended) with 
+loadKey(key) or loadKeyFromFile(file).  Then call getData() to generate
+internal data structures.
+
+getLongNames() returns a list of all route names.
+getUniqueStops() returns a count of the total number of unique stops across
+all routes.
+getMostStops() returns the long name of the route with the most stops.
+getFewestStops() returns the long name of the route with the fewest stops.
+getMostConnectivity() returns the name of the stop that has the most 
+connections to other stops.
+getRoutesBetweenStops() returns a list of routes between two stops.
+setCovidMode(bool) allows assignment of a mode that closes stops with 
+certain names and allows connected closed stops to be travelled between.
+Setting to false restores the previous state of closures and removes the
+special mode.
 
 """
 from os import path
@@ -29,7 +47,8 @@ class MBTANavigator:
         self.stopsClosed = {}
         #Special case for also closing a certain subset of stops.
         self.stopsClosedCovid = {}
-        
+    
+    #Get a list of the long (external-facing) route names
     def getLongNames(self):
         longNames = []
         for route in self.allRoutes:
@@ -51,7 +70,7 @@ class MBTANavigator:
         return self.allRoutes[routeInd].getLongName()
             
     #Other interesting statistic:
-    #Return the long name of the stop with the most connectivity to other stops
+    #Return the name of the stop with the most connectivity to other stops
     def getMostConnectivity(self):
         graph = self.stopGraph.getGraph();
         maxStops = 0;
@@ -59,7 +78,11 @@ class MBTANavigator:
             if len(graph[key]) > maxStops:
                 maxStops = len(graph[key])
                 mostConn = key
-        return mostConn             
+        return mostConn            
+    
+    #Get the number of connections available at any stop
+    def getNumConnections(self, stop):
+        return len(self.stopGraph.getGraph()[stop])
     
     
     #Get list of routes between firstStop and secondStop.
@@ -71,11 +94,19 @@ class MBTANavigator:
         else:
             #Interpret path into routes.
             outputRoutes = []
-            for stop in path:
-                routeName = self.stopsLongName[stop]
-                #Add a route if transferring to a new, unique line
-                if len(routeName) == 1 and routeName[0] not in outputRoutes:
-                    outputRoutes.append(routeName[0])     
+            prevRoutes = self.stopsLongName[firstStop]
+            for i in range(1, len(path)):
+                routeName = self.stopsLongName[path[i]]
+                routeIntersect = list(set(prevRoutes) & set(routeName))
+                #Add a route if transferring to a new, unique line.
+                #In most realistic subway systems this will not produce an 
+                #excessive amount of transfers, but it is not optimized for 
+                #transfers and does not account for journey length
+                if len(outputRoutes) == 0 or \
+                (routeIntersect[0] not in outputRoutes and len(routeName) == 1):
+                    outputRoutes.append(routeIntersect[0])
+                prevRoutes = routeName
+       
         return outputRoutes    
     
     #Set COVID Mode on or off, closing stops that contain a word starting with 
@@ -98,6 +129,7 @@ class MBTANavigator:
                     hasLetter = [x.startswith(letter) for x in splitStop]
                     if any(hasLetter):
                         self.stopsClosedCovid[stop] = True
+            self.stopGraph.setCovidMode(mode)
             self.stopGraph.setClosedStops(self.stopsClosedCovid)     
                 
     #Load an API key from filepath if available.
@@ -160,8 +192,8 @@ class MBTANavigator:
         #Add closures to the graph
         self.stopGraph.setClosedStops(self.stopsClosed)
 
-        #Manually clear and reassign the southern tips of the Red Line.
-        #[TODO] Is there a distinction between Ashmont/Braintree lines being missed?
+        #Manually clear and reassign the southern tips of the Red Line that are
+        #grouped into the Ashmont/Braintree direction
         stopsToClear = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
                         'Shawmut', 'Ashmont', 'North Quincy', 'Wollaston',
                         'Quincy Center', 'Quincy Adams', 'Braintree']
@@ -185,18 +217,11 @@ class MBTANavigator:
             self.stopGraph.addEdge(prevStop, stop)
             self.stopGraph.addEdge(stop, prevStop)
             prevStop = stop
-        
-        
+                
         #Close connection
         conn.close()
         
   
-if __name__ == "__main__":
-    mb = MBTANavigator()
-    keyPath = "key.txt"
-    mb.loadKeyFromPath(keyPath)
-    mb.getData()
-    rt = mb.getLongNames()
-    mb.setCovidMode(True)
+
     
         

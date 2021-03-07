@@ -101,13 +101,13 @@ class MBTANavigatorTest(unittest.TestCase):
     def testCovidClosureFailure(self):
         self.navi.setCovidMode('foo')
      
-    #Test navigation failure after COVID closure
+    #Test navigation failure after Covid closure
     def testCovidClosure(self):
         self.navi.setCovidMode(True)
         ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
         self.assertEqual(ans, [])
         
-    #Test COVID closure being turned on and off.'
+    #Test Covid closure being turned on and off.'
     def testTurnOffCovidClosure(self):
        self.navi.setCovidMode(True)
        ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
@@ -115,6 +115,6 @@ class MBTANavigatorTest(unittest.TestCase):
        self.navi.setCovidMode(False)
        ans = self.navi.getRoutesBetweenStops('Stony Brook', 'Downtown Crossing')
        self.assertEqual(ans, ['Orange Line'])
-   
+          
 if __name__ == "__main__":
     unittest.main()
