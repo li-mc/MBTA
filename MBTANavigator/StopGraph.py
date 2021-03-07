@@ -13,5 +13,13 @@ class StopGraph:
     def __init__(self):
         self.graphDict = {};
         
-    def addNode(self):
+    def addStop(self, stop):
+        if stop not in self.graphDict:
+            self.graphDict[stop] = [];
+        
+        
+    def addEdge(self, edge):
+        print(0)
+    
+
         

@@ -45,7 +45,7 @@ class MBTANavigatorTest(unittest.TestCase):
     #Test the count 
     def testTotalUnique(self):
         nm = self.navi.getUniqueStops();
-        self.assertEqual(nm, 148)
+        self.assertEqual(nm, 118)
         
     #Test that the return for the MBTA route with the most stops is correct.
     def testMostStops(self):

@@ -17,11 +17,10 @@ from MBTANavigator import MBTANavigator
 if __name__ == "__main__":
     mb = MBTANavigator()
     keyPath = "key.txt'"
-    mb.loadKey(keyPath)
+    mb.loadKeyFromPath(keyPath)
     mb.getData()
     rt = mb.getLongNames()
     mb.getUniqueStops()
-    print(rt)
     
     
     
