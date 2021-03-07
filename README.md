@@ -16,7 +16,7 @@ setCovidMode(bool) allows assignment of a mode that closes stops with
 certain names and allows connected closed stops to be travelled between. Setting to false restores the previous state of closures and removes the special mode.
 travelIsPossible(stop1, stop2) returns whether it is possible to travel between two stops.  
 
-![Demo Output](NavigatorDemo.png)
+![Demo Output](demo_screenshot.png)
 
 
 
