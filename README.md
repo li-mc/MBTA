@@ -1,5 +1,5 @@
 ## MBTA Rail Line Exploration
-Li McCarthy | Mar. 5 2021
+Li McCarthy | Last Updated Mar. 7 2021
 
 This is a small program that retrieves data from the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions
 about the rail lines.  A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  A screenshot of the output is attached at the end of this section.  
