@@ -7,13 +7,15 @@ This is a small program that queries the open-source MBTA API (https://www.mbta.
 
 ### Data  
   
-The MBTA API allows for retrieval of rich data related to bus and train line scheduling, stop locations, alerts, facilities, and more.  We focus on the limited scope of Light and Heavy Rail line Routes and Stops. Coloquially, a Route is a train line: the Red Line, Blue Line, Orange Line, Mattapan Trolley, and Green Lines B, C, D, and E. The Green Line branches are treated as separate Routes, while the Red Line branches are referred to by the same Red Line designation.  While technically contiguous with the Red Line on maps of the MBTA, the Mattapan Trolley is an independent Route that runs between Ashmont and Mattapan.
+The MBTA API allows for retrieval of rich data related to bus and train line scheduling, stop locations, alerts, facilities, and more.  We focus on the limited scope of Light and Heavy Rail line Routes and Stops. Colloquially, a _Route_ is a train line: the Red Line, Blue Line, Orange Line, Mattapan Trolley, and Green Lines B, C, D, and E. The Green Line branches are treated as separate Routes, while the Red Line branches are referred to by the same Red Line designation.  While technically contiguous with the Red Line on maps of the MBTA, the Mattapan Trolley is an independent Route that runs between Ashmont and Mattapan.
   
-A Stop in this representation refers to one station along each Line.  A Stop is associated with one or more Routes, representing transfers that can occur at each Stop.  
+A _Stop_ in this representation refers to one station along each Line.  A Stop is associated with one or more Routes, representing transfers that can occur at each Stop.  
 
 ### How to Use  
   
 The program can be run manually by instantiating MBTANavigator.py.  An API Key is optional but recommended (https://api-v3.mbta.com/register) to avoid being rate-limited.  To load data, first enter the API Key or load it from a file with ```loadKey(key)``` or ```loadKeyFromFile(filename)```.  Then call ```getData()``` to generate internal data structures.  
+  
+### Interface  
   
 ```loadKey(String)``` stores a user-entered API key.  
   
