@@ -4,7 +4,8 @@ Li McCarthy | Last Updated Mar. 7 2021
 This is a small program that retrieves data from the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions
 about the rail lines.  A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  A screenshot of the output is attached at the end of this section.  
 
-The program can also be run manually by instantiating MBTANavigator.py.  To load data, first load API key (optional but recommended) with loadKey(key) or loadKeyFromFile(file).  Then call getData() to generate internal data structures.  
+The program can also be run manually by instantiating MBTANavigator.py.  To load data, first load API key (https://api-v3.mbta.com/register, optional but recommended) with loadKey(key) or loadKeyFromFile(file).  Then call getData() to generate internal data structures.  
+
 
 * getLongNames() returns a list of all route names.  
 * getUniqueStops() returns a count of the total number of unique stops across
