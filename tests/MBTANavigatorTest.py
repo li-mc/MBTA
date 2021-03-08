@@ -6,10 +6,12 @@ Created on Sat Mar  6 20:23:47 2021
 @author: Li
 
 Test cases for MBTA Navigator.
-This information is easily available so it can be tested directly.  
-Tests that build the underlying graph are in StopGraphTest.py
+This information is easily available so it can be tested directly, though
+it would be preferable to mock the data retrieval.
 
-Covers the following:
+Requires "key.txt" containing only an API key to avoid getting rate-limited.
+
+Tests cover the following:
 * Retrieve a text list of each route "Long Name"
 * Get the total number of unique stops
 * Get the name of the route with the most stops and the route with the fewest
@@ -33,7 +35,7 @@ class MBTANavigatorTest(unittest.TestCase):
                            'Green Line B', 'Green Line C', 'Green Line D',
                            'Green Line E', 'Blue Line'];
         self.navi = MBTANavigator()
-        self.navi.loadKey("7c2ebb9b2cd74b62905201d54a8258ab")
+        self.navi.loadKeyFromPath("key.txt")
         self.navi.getData()
      
     

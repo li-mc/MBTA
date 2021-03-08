@@ -13,9 +13,10 @@ from MBTANavigator import MBTANavigator
 if __name__ == "__main__":
     print('Starting MBTA Navigator Demo\n')
     mb = MBTANavigator()
-    #This key is generated specifically for this demo and not stored elsewhere
-    #in the source.  Typically I would ask the user to enter it.
-    mb.loadKey("7c2ebb9b2cd74b62905201d54a8258ab");
+    
+    #I recommend entering an API key here through loadKey() or loadKeyFromFile()
+    #to avoid rate limitations.
+    
     mb.getData()
     print("The long names of all the MBTA routes are: " 
           + str(mb.getLongNames()) + "\n")
