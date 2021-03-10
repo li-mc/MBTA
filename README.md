@@ -74,6 +74,4 @@ A method is provided that sets a new mode for the program--one that closes stops
   
 MBTANavigator provides an interface for simple queries. To generate paths, it builds a directed graph of stops (StopGraph.py) that is sensitive to stop closures. Getting the list of routes between two stops first uses a breadth-first search on the graph to find the shortest path between the stops from the graph, then MBTANavigator translates the list of stops into a list of routes with a greedy selection of the first intersecting route between each pair of stops. Transfers are treated as negligible -- the MBTA has relatively low connectivity, so it would typically be unlikely to generate a labor-intensive series of transfers that has fewer stops rather than one direct path that has more stops. Realistically, generating the optimal list of routes between point A and point B would also weight transfers from one route to another.  
   
-### Demo Output  
-  
-![Demo Output](demo_screenshot.png)
+
