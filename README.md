@@ -11,9 +11,41 @@ The MBTA API allows for retrieval of rich data related to bus and train line sch
   
 A _Stop_ in this representation refers to one station along each Line. A Stop is associated with one or more Routes, representing transfers that can occur at each Stop.  
 
+### Demo
+To view some sample outputs, use a command prompt/terminal to navigate to the containing folder, then run **```python NavigatorDemo.py```**. This prints some simple outputs using real data.  
+
 ### How to Use  
-  
-The program can be run manually by instantiating MBTANavigator.py. An API Key is optional but recommended (https://api-v3.mbta.com/register) to avoid being rate-limited. To load data, first enter the API Key or load it from a file with ```loadKey(key)``` or ```loadKeyFromFile(filename)```. Then call ```getData()``` to generate internal data structures.  
+To answer other questions, use a python script to manually instantiate the MBTANavigator class. An API Key is optional but recommended (https://api-v3.mbta.com/register) to avoid being rate-limited. To load data, first enter the API Key or load it from a file with ```loadKey(key)``` or ```loadKeyFromFile(filename)```. Then call ```getData()``` to generate internal data structures. 
+
+```
+navi = MBTANavigator()
+# navi.loadKey(key) recommended
+navi.getData()
+```
+
+##### Q1
+On your instance of the MBTANavigator class, you can retrieve the "Long Names" (e.g. Red Line, Orange Line, etc) of all rail lines:  
+```
+print(navi.getLongNames())
+```
+
+##### Q2
+The following summary metrics are provided:  
+(1) The total number of unique stops  
+**```print(navi.getUniqueStops())  ```**  
+(2) The route with the most stops  
+**```print(navi.getMostStops())  ```**  
+(3) The route with the fewest stops  
+**```print(navi.getFewestStops())  ```**  
+(4) The stop with the highest connectivity to other stops  
+**```print(navi.getMostConnectivity())```**  
+
+##### Q3  
+A method is provided to take in two stops, then return a list of routes to be taken to travel from the first stop to the second stop. 
+**```print(navi.getRoutesBetweenStops('Kendall/MIT', 'Kenmore'))```**  
+
+##### Q4
+A method is provided that sets a new mode for the program--one that closes stops with any word starting with ['C', 'O', 'V', 'I', 'D'], case-sensitive.  These stops are accessible from other closed stops, and open stops are accessible from other open stops, but the two cannot be moved between.  Methods are provided to set and remove this mode, to get the routes between stops, and to get whether it is possible to move between the two stops.  
   
 ### Interface  
   
