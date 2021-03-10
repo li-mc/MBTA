@@ -4,9 +4,6 @@ Li McCarthy | Last Updated Mar. 10 2021
 ### Summary  
 This is a small program that queries the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions about the rail lines (Light Rail and Heavy Rail). 
 
-### Demo
-A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  Use a command prompt/terminal to navigate to the containing folder, then run **```python NavigatorDemo.py```**. A screenshot of the output is attached at the end of this page.  
-
 ### Data  
 The MBTA API allows for retrieval of rich data related to bus and train line scheduling, stop locations, alerts, facilities, and more. We focus on the limited scope of Light and Heavy Rail line Routes and Stops. Colloquially, a _Route_ is a train line: the Red Line, Blue Line, Orange Line, Mattapan Trolley, and Green Lines B, C, D, and E. The Green Line branches are treated as separate Routes, while the Red Line branches are referred to by the same Red Line designation. While technically contiguous with the Red Line on maps of the MBTA, the Mattapan Trolley is an independent Route that runs between Ashmont and Mattapan.
   
@@ -24,25 +21,26 @@ navi.getData()
 
 ##### Q1
 On your instance of the MBTANavigator class, you can retrieve the "Long Names" (e.g. Red Line, Orange Line, etc) of all rail lines:  
-```
-print(navi.getLongNames())
-```
-
+**```print(navi.getLongNames())```**
+```['Red Line', 'Mattapan Trolley', 'Orange Line', 'Green Line B', 'Green Line C', 'Green Line D', 'Green Line E', 'Blue Line']```
 ##### Q2
 The following summary metrics are provided:  
 (1) The total number of unique stops  
 **```print(navi.getUniqueStops())  ```**  
+```118```  
 (2) The route with the most stops  
 **```print(navi.getMostStops())  ```**  
+```Green Line B```  
 (3) The route with the fewest stops  
 **```print(navi.getFewestStops())  ```**  
+```Mattapan Trolley```  
 (4) The stop with the highest connectivity to other stops  
 **```print(navi.getMostConnectivity())```**  
-
+```Park Street```  
 ##### Q3  
 A method is provided to take in two stops, then return a list of routes to be taken to travel from the first stop to the second stop. 
 **```print(navi.getRoutesBetweenStops('Kendall/MIT', 'Kenmore'))```**  
-
+```['Red Line', 'Green Line B']```
 ##### Q4
 A method is provided that sets a new mode for the program--one that closes stops with any word starting with ['C', 'O', 'V', 'I', 'D'], case-sensitive.  These stops are accessible from other closed stops, and open stops are accessible from other open stops, but the two cannot be moved between.  Methods are provided to set and remove this mode, to get the routes between stops, and to get whether it is possible to move between the two stops.  
   
@@ -73,5 +71,47 @@ A method is provided that sets a new mode for the program--one that closes stops
 ### Design  
   
 MBTANavigator provides an interface for simple queries. To generate paths, it builds a directed graph of stops (StopGraph.py) that is sensitive to stop closures. Getting the list of routes between two stops first uses a breadth-first search on the graph to find the shortest path between the stops from the graph, then MBTANavigator translates the list of stops into a list of routes with a greedy selection of the first intersecting route between each pair of stops. Transfers are treated as negligible -- the MBTA has relatively low connectivity, so it would typically be unlikely to generate a labor-intensive series of transfers that has fewer stops rather than one direct path that has more stops. Realistically, generating the optimal list of routes between point A and point B would also weight transfers from one route to another.  
+
+
+### Demo
+A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  Use a command prompt/terminal to navigate to the containing folder, then run **```python NavigatorDemo.py```**. 
+
+```
+Starting MBTA Navigator Demo
+
+The long names of all the MBTA routes are: ['Red Line', 'Mattapan Trolley', 'Orange Line', 'Green Line B', 'Green Line C', 'Green Line D', 'Green Line E', 'Blue Line']
+
+Here are some interesting metrics:
+Out of the MBTA Light and Heavy Rail lines, there are 118 unique stops.
+
+Out of the MBTA Light Rail and Heavy Rail lines, Green Line B has the most stops and Mattapan Trolley has the fewest stops.
+
+The best-connected stop is Park Street, which has a total of 4 connections
+
+Here are a few samples of transfers we can take to get around: 
+
+To get from the Broad Institute (Kendall/MIT) to the Museum of Fine Arts: 
+['Red Line', 'Green Line B', 'Green Line E']
+Then to go from the MFA to the aquarium: 
+['Green Line E', 'Red Line', 'Orange Line', 'Blue Line']
+
+Unfortunately, we have to closed service for any station that has a name starting with a letter in COVID
+We could previously ride from Tufts Medical Center to Sullivan Square: 
+['Orange Line']
+
+Now with the mode enabled, our route is: []
+
+However, trains are still running on a closed loop between closed and non-closed stations.
+We can take the train from Tufts Medical Center to Downtown Crossing: ['Orange Line']
+
+We can also take the train between State and North Station: ['Orange Line']
+But we can't reach Community College, which is one stop away: []
+
+We can ask if travel is possible between two stops. For State to North Station, the answer is: True
+And for State and Community College, the answer is: False
+
+Finally, if we turn off COVID Mode, we can ask about State to North Station again, and the answer is: True
+```
+
   
 
