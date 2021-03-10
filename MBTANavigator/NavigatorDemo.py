@@ -16,7 +16,7 @@ if __name__ == "__main__":
     
     #I recommend entering an API key here through loadKey() or loadKeyFromFile()
     #to avoid rate limitations.
-    
+    mb.loadKeyFromPath("key.txt")
     mb.getData()
     print("The long names of all the MBTA routes are: " 
           + str(mb.getLongNames()) + "\n")

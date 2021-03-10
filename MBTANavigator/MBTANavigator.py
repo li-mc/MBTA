@@ -103,11 +103,24 @@ class MBTANavigator:
                 #Add a route if transferring to a new, unique line.
                 #In most realistic subway systems this will not produce an 
                 #excessive amount of transfers, but it is not optimized for 
-                #transfers and does not account for journey length
+                #transfers and does not account for journey length.
+                
+                #Green line branches are also over-specified (e.g. if it is 
+                #possible to take branch B or E, the output will only list one 
+                #of them as the correct result.
+                
+                #If we have just started the journey, or we have just one  
+                #available transfer, add route to the output.
                 if len(outputRoutes) == 0 or \
                 (routeIntersect[0] not in outputRoutes and len(routeName) == 1):
                     outputRoutes.append(routeIntersect[0])
+                    
                 prevRoutes = routeName
+                
+                #If we have multiple available transfers, add the first one 
+                #to the output.
+                if len(list(set(outputRoutes) & set(prevRoutes))) == 0:
+                    outputRoutes.append(routeIntersect[0])
        
         return outputRoutes    
     
@@ -234,5 +247,13 @@ class MBTANavigator:
         
   
 
-    
+if __name__ == "__main__":
+    navi = MBTANavigator();
+    navi.getData()
+    navi.loadKeyFromPath("key.txt")
+    print(navi.getUniqueStops())
+    print(navi.getMostStops())
+    print(navi.getFewestStops())
+    print(navi.getRoutesBetweenStops('Arlington', 'Haymarket'))
+    print(navi.getMostConnectivity())    
         
