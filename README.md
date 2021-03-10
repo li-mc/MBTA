@@ -2,17 +2,16 @@
 Li McCarthy | Last Updated Mar. 10 2021
 
 ### Summary  
-  
-This is a small program that queries the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions about the rail lines (Light Rail and Heavy Rail). A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works. A screenshot of the output is attached at the end of this page.  
+This is a small program that queries the open-source MBTA API (https://www.mbta.com/developers/v3-api) and uses it to answer questions about the rail lines (Light Rail and Heavy Rail). 
+
+### Demo
+A demo program (NavigatorDemo.py) is provided that prints some sample output demonstrating how the program works.  Use a command prompt/terminal to navigate to the containing folder, then run **```python NavigatorDemo.py```**. A screenshot of the output is attached at the end of this page.  
 
 ### Data  
-  
 The MBTA API allows for retrieval of rich data related to bus and train line scheduling, stop locations, alerts, facilities, and more. We focus on the limited scope of Light and Heavy Rail line Routes and Stops. Colloquially, a _Route_ is a train line: the Red Line, Blue Line, Orange Line, Mattapan Trolley, and Green Lines B, C, D, and E. The Green Line branches are treated as separate Routes, while the Red Line branches are referred to by the same Red Line designation. While technically contiguous with the Red Line on maps of the MBTA, the Mattapan Trolley is an independent Route that runs between Ashmont and Mattapan.
   
 A _Stop_ in this representation refers to one station along each Line. A Stop is associated with one or more Routes, representing transfers that can occur at each Stop.  
 
-### Demo
-To view some sample outputs, use a command prompt/terminal to navigate to the containing folder, then run **```python NavigatorDemo.py```**. This prints some simple outputs using real data.  
 
 ### How to Use  
 To answer other questions, use a python script to manually instantiate the MBTANavigator class. An API Key is optional but recommended (https://api-v3.mbta.com/register) to avoid being rate-limited. To load data, first enter the API Key or load it from a file with ```loadKey(key)``` or ```loadKeyFromFile(filename)```. Then call ```getData()``` to generate internal data structures. 
