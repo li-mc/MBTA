@@ -43,6 +43,12 @@ A method is provided to take in two stops, then return a list of routes to be ta
 ```['Red Line', 'Green Line B']```
 ##### Q4
 A method is provided that sets a new mode for the program--one that closes stops with any word starting with ['C', 'O', 'V', 'I', 'D'], case-sensitive.  These stops are accessible from other closed stops, and open stops are accessible from other open stops, but the two cannot be moved between.  Methods are provided to set and remove this mode, to get the routes between stops, and to get whether it is possible to move between the two stops.  
+**```navi.setCovidMode(True)```**  
+**```navi.travelIsPossible('State, 'Community College')```**  
+```False```  
+**```navi.setCovidMode(False)```**  
+**```navi.travelIsPossible('State, 'Community College')```**  
+```True```  
   
 ### Interface  
   
