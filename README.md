@@ -44,10 +44,10 @@ A method is provided to take in two stops, then return a list of routes to be ta
 ##### Q4
 A method is provided that sets a new mode for the program--one that closes stops with any word starting with ['C', 'O', 'V', 'I', 'D'], case-sensitive.  These stops are accessible from other closed stops, and open stops are accessible from other open stops, but the two cannot be moved between.  Methods are provided to set and remove this mode, to get the routes between stops, and to get whether it is possible to move between the two stops.  
 **```navi.setCovidMode(True)```**  
-**```navi.travelIsPossible('State, 'Community College')```**  
+**```print(navi.travelIsPossible('State, 'Community College'))```**  
 ```False```  
 **```navi.setCovidMode(False)```**  
-**```navi.travelIsPossible('State, 'Community College')```**  
+**```print(navi.travelIsPossible('State, 'Community College'))```**  
 ```True```  
   
 ### Interface  
@@ -76,7 +76,8 @@ A method is provided that sets a new mode for the program--one that closes stops
   
 ### Design  
   
-MBTANavigator provides an interface for simple queries. To generate paths, it builds a directed graph of stops (StopGraph.py) that is sensitive to stop closures. Getting the list of routes between two stops first uses a breadth-first search on the graph to find the shortest path between the stops from the graph, then MBTANavigator translates the list of stops into a list of routes with a greedy selection of the first intersecting route between each pair of stops. Transfers are treated as negligible -- the MBTA has relatively low connectivity, so it would typically be unlikely to generate a labor-intensive series of transfers that has fewer stops rather than one direct path that has more stops. Realistically, generating the optimal list of routes between point A and point B would also weight transfers from one route to another.  
+MBTANavigator provides an interface for simple queries. To generate paths, it builds a directed graph of stops (StopGraph.py) that is sensitive to stop closures. Getting the list of routes between two stops first uses a breadth-first search on the graph to find the shortest path between the stops from the graph, then MBTANavigator translates the list of stops into a list of routes with a greedy selection of the first intersecting route between each pair of stops or a transfer if none exists.  
+Ideally, generating the "best" list of routes between stop A and stop B would also account for user preference corresponding to factors such as path length, number of stops, and amount of transfers.  As it is, the time taken to make transfers, the travel time, and the physical distance between stops is disregarded in favor of searching for the smallest number of stops.
 
 
 ### Demo
