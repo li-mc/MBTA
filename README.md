@@ -21,7 +21,7 @@ navi.getData()
 
 ##### Q1
 On your instance of the MBTANavigator class, you can retrieve the "Long Names" (e.g. Red Line, Orange Line, etc) of all rail lines:  
-**```print(navi.getLongNames())```**
+**```print(navi.getLongNames())```**  
 ```['Red Line', 'Mattapan Trolley', 'Orange Line', 'Green Line B', 'Green Line C', 'Green Line D', 'Green Line E', 'Blue Line']```
 ##### Q2
 The following summary metrics are provided:  
