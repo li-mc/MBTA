@@ -244,15 +244,3 @@ class MBTANavigator:
         #Close connection
         conn.close()
         
-  
-
-if __name__ == "__main__":
-    navi = MBTANavigator();
-    navi.getData()
-    navi.loadKeyFromPath("key.txt")
-    print(navi.getUniqueStops())
-    print(navi.getMostStops())
-    print(navi.getFewestStops())
-    print(navi.getRoutesBetweenStops('Arlington', 'Haymarket'))
-    print(navi.getMostConnectivity())    
-        
