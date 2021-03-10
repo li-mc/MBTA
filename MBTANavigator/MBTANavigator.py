@@ -114,6 +114,7 @@ class MBTANavigator:
     #Return whether travel between two stops is possible, without regard to
     #the actual route.
     def travelIsPossible(self, firstStop, secondStop):
+        path = self.getRoutesBetweenStops(firstStop, secondStop)
         if len(path) == 0:
             return False
         else:
