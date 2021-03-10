@@ -103,8 +103,7 @@ class MBTANavigator:
                 #Add a route if transferring to a new, unique line.
                 #In most realistic subway systems this will not produce an 
                 #excessive amount of transfers, but it is not optimized for 
-                #transfers and does not account for journey length.
-                
+                #transfers and does not account for journey length.                
                 #Green line branches are also over-specified (e.g. if it is 
                 #possible to take branch B or E, the output will only list one 
                 #of them as the correct result.
