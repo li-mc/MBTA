@@ -49,9 +49,11 @@ class MBTANavigator:
         self.stopsClosed = {}
         #Special case for also closing a certain subset of stops.
         self.stopsClosedCovid = {}
+        self.isInitialized = False
     
     #Get a list of the long (external-facing) route names
     def getLongNames(self):
+        self.checkInternalState()
         longNames = []
         for route in self.allRoutes:
             longNames.append(route.getLongName())
@@ -59,21 +61,25 @@ class MBTANavigator:
 
     #Get the total count of unique stops
     def getUniqueStops(self):
+        self.checkInternalState()
         return(len(self.stopGraph.getGraph().keys()))
     
     #Return the long name of the Route with the most stops
     def getMostStops(self):
+        self.checkInternalState()
         routeInd = np.argmax(list([x.getNumStops() for x in self.allRoutes]))
         return self.allRoutes[routeInd].getLongName()
     
     #Return the long name of the Route with the fewest stops
     def getFewestStops(self):
+        self.checkInternalState()
         routeInd = np.argmin(list([x.getNumStops() for x in self.allRoutes]))
         return self.allRoutes[routeInd].getLongName()
             
     #Other interesting statistic:
     #Return the name of the stop with the most connectivity to other stops
     def getMostConnectivity(self):
+        self.checkInternalState()
         graph = self.stopGraph.getGraph();
         maxStops = 0;
         for key in graph.keys():
@@ -84,12 +90,14 @@ class MBTANavigator:
     
     #Get the number of connections available at any stop
     def getNumConnections(self, stop):
+        self.checkInternalState()
         return len(self.stopGraph.getGraph()[stop])
     
     
     #Get list of routes between firstStop and secondStop.
     #Return empty if none.
     def getRoutesBetweenStops(self, firstStop, secondStop):
+        self.checkInternalState()
         path = self.stopGraph.getPathBetweenStops(firstStop, secondStop)
         if len(path) == 0:
             return []
@@ -126,6 +134,7 @@ class MBTANavigator:
     #Return whether travel between two stops is possible, without regard to
     #the actual route.
     def travelIsPossible(self, firstStop, secondStop):
+        self.checkInternalState()
         path = self.getRoutesBetweenStops(firstStop, secondStop)
         if len(path) == 0:
             return False
@@ -136,6 +145,7 @@ class MBTANavigator:
     #[C, O, V, I, D]
     #Respects case
     def setCovidMode(self, mode):
+        self.checkInternalState()
         if not isinstance(mode, bool):
             raise TypeError('Invalid input for Covid Mode')
         #Update settings to turn on covid mode
@@ -157,10 +167,15 @@ class MBTANavigator:
                 
     #Load an API key from filepath if available.
     def loadKeyFromPath(self, keyPath):
-        if path.exists(keyPath):
-            fl = open(keyPath, "r")
-            self.APIKey = fl.read().strip();
-            fl.close()
+        if not path.exists(keyPath):
+            raise Exception('File does not exist')
+        try:
+            if path.exists(keyPath):
+                fl = open(keyPath, "r")
+                self.APIKey = fl.read().strip();
+                fl.close()
+        except:
+            raise Exception("Error loading key from file.")
 
     #Load key from text
     def loadKey(self, key):
@@ -169,78 +184,88 @@ class MBTANavigator:
     
     #Connect using the API key, if available and build stops graph.
     def getData(self):
-        conn = http.client.HTTPSConnection('api-v3.mbta.com')
-        if len(self.APIKey) == 0:
-            connReq = "?"
-        else:
-            connReq = "?api_key=" + self.APIKey + "&";
-        #Filter by type of route to avoid pulling high-density bus data.
-        conn.request("GET", "/routes" + connReq + "filter[type]=0,1") 
-        res = conn.getresponse().read().decode()
-        self.routeData = json.loads(res)["data"]
-        
-        #Initialize graph
-        self.stopGraph = StopGraph()
-         
-        prevStop = []
-        for route in self.routeData:
-            conn.request("GET", "/stops" + connReq 
-                         + "filter[route]=" + route['id'])
+        try:
+            conn = http.client.HTTPSConnection('api-v3.mbta.com')
+            if len(self.APIKey) == 0:
+                connReq = "?"
+            else:
+                connReq = "?api_key=" + self.APIKey + "&";
+            #Filter by type of route to avoid pulling high-density bus data.
+            conn.request("GET", "/routes" + connReq + "filter[type]=0,1") 
             res = conn.getresponse().read().decode()
-            stops = json.loads(res)['data']
-                                
-            for stop in stops:
-                stopName = stop['attributes']['name']
-                self.stopsClosed[stopName] = False
-                if stopName not in self.stopsLongName:
-                    self.stopsLongName[stopName] = [route['attributes']['long_name']]
-                else:
-                    self.stopsLongName[stopName].append(route['attributes']['long_name'])
-                        
-                #Build graph
-                self.stopGraph.addStop(stopName)
-                if len(prevStop) > 0:
-                    self.stopGraph.addEdge(prevStop, stopName)
-                    self.stopGraph.addEdge(stopName, prevStop)                       
-                prevStop = stopName;
-                #Reach the end of the line and reset.
+            self.routeData = json.loads(res)["data"]
+            
+            #Initialize graph
+            self.stopGraph = StopGraph()
+             
             prevStop = []
+            for route in self.routeData:
+                conn.request("GET", "/stops" + connReq 
+                             + "filter[route]=" + route['id'])
+                res = conn.getresponse().read().decode()
+                stops = json.loads(res)['data']
+                                
+                for stop in stops:
+                    stopName = stop['attributes']['name']
+                    self.stopsClosed[stopName] = False
+                    if stopName not in self.stopsLongName:
+                        self.stopsLongName[stopName] = [route['attributes']['long_name']]
+                    else:
+                        self.stopsLongName[stopName].append(route['attributes']['long_name'])
+                            
+                    #Build graph
+                    self.stopGraph.addStop(stopName)
+                    if len(prevStop) > 0:
+                        self.stopGraph.addEdge(prevStop, stopName)
+                        self.stopGraph.addEdge(stopName, prevStop)                       
+                    prevStop = stopName;
+                    #Reach the end of the line and reset.
+                prevStop = []
                 
             
-            #Add a route to the list of routes.
-            self.allRoutes.append(Route(route['attributes']['long_name'],
-                                        route['id'],
-                                        route['attributes']['direction_names'],
-                                        len(stops)))
-        #Add closures to the graph
-        self.stopGraph.setClosedStops(self.stopsClosed)
-
-        #Manually clear and reassign the southern tips of the Red Line that are
-        #grouped into the Ashmont/Braintree direction
-        stopsToClear = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
-                        'Shawmut', 'Ashmont', 'North Quincy', 'Wollaston',
-                        'Quincy Center', 'Quincy Adams', 'Braintree']
-        for stop in stopsToClear:
-            self.stopGraph.clearStop(stop)
+                #Add a route to the list of routes.
+                self.allRoutes.append(Route(route['attributes']['long_name'],
+                                            route['id'],
+                                            route['attributes']['direction_names'],
+                                            len(stops)))
+            #Add closures to the graph
+            self.stopGraph.setClosedStops(self.stopsClosed)
+        
+            #Manually clear and reassign the southern tips of the Red Line that are
+            #grouped into the Ashmont/Braintree direction
+            stopsToClear = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
+                            'Shawmut', 'Ashmont', 'North Quincy', 'Wollaston',
+                            'Quincy Center', 'Quincy Adams', 'Braintree']
+            for stop in stopsToClear:
+                self.stopGraph.clearStop(stop)
+                
+            #Reassign the tips.
+            prevStop = 'Andrew';
+            ashLine = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
+                       'Shawmut', 'Ashmont', 'Cedar Grove']
+            brainLine = ['JFK/UMass', 'North Quincy', 'Wollaston', 'Quincy Center',
+                         'Quincy Adams', 'Braintree']
             
-        #Reassign the tips.
-        prevStop = 'Andrew';
-        ashLine = ['JFK/UMass', 'Savin Hill', 'Fields Corner',
-                   'Shawmut', 'Ashmont', 'Cedar Grove']
-        brainLine = ['JFK/UMass', 'North Quincy', 'Wollaston', 'Quincy Center',
-                     'Quincy Adams', 'Braintree']
-        
-        for stop in ashLine:
-            self.stopGraph.addEdge(prevStop, stop)
-            self.stopGraph.addEdge(stop, prevStop)
-            prevStop = stop
-        
-        prevStop = 'Andrew';
-        for stop in brainLine:
-            self.stopGraph.addEdge(prevStop, stop)
-            self.stopGraph.addEdge(stop, prevStop)
-            prevStop = stop
+            for stop in ashLine:
+                self.stopGraph.addEdge(prevStop, stop)
+                self.stopGraph.addEdge(stop, prevStop)
+                prevStop = stop
+            
+            prevStop = 'Andrew';
+            for stop in brainLine:
+                self.stopGraph.addEdge(prevStop, stop)
+                self.stopGraph.addEdge(stop, prevStop)
+                prevStop = stop
                 
         #Close connection
-        conn.close()
+            conn.close()
+            self.isInitialized = True
+        except:
+            raise Exception('An error occurred when retrieving data.')
+     
+    #Checks if internal data structures have been populated, throw an exception 
+    #if not
+    def checkInternalState(self):
+        if not self.isInitialized:
+            raise Exception('Internal data incomplete, call getData() to populate')
         
