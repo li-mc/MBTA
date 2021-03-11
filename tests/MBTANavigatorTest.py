@@ -38,7 +38,26 @@ class MBTANavigatorTest(unittest.TestCase):
         self.navi.loadKeyFromPath("key.txt")
         self.navi.getData()
      
-    
+    #Test initialization without pre-populating data raises an exception
+    @unittest.expectedFailure
+    def testInitVal(self):
+        navi = MBTANavigator()
+        navi.getLongNames()
+        
+    #Test that loading an invalid key raises an exception
+    @unittest.expectedFailure
+    def testInitFalseKey(self):
+        navi = MBTANavigator()
+        navi.loadKey("key")
+        navi.getData()
+        
+    #Test that loading an invalid key from file raises an exception
+    @unittest.expectedFailure
+    def testInitFalseKeyFile(self):
+        navi = MBTANavigator()
+        navi.loadKeyFromPath("key")
+        navi.getData()
+
     #Test that the "Long Names" for each route are identical.
     #Ordering of return is not specified.
     def testNames(self):
